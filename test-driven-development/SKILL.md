@@ -23,6 +23,7 @@ description: 在实现任何功能或修复bug时使用，必须在编写实现�
 ## 何时使用
 
 **总是使用：**
+
 - 新功能
 - Bug修复
 - 重构
@@ -452,135 +453,30 @@ TEST(UserServiceTest, FetchesUserFromDatabase) {
 }
 ```
 
-## 为什么顺序很重要 - TDD的核心理念
+## TDD 关键检查点
 
-#### 不要编写功能代码之后再编写测试来验证它工作
+### 应该做的
 
-测试优先强制你看到测试失败，证明它确实测试了某些东西。
+1. **先写测试，再写代码**
+2. **每次只做一件小事**
+3. **频繁运行测试**
+4. **测试要简单明了**
+5. **测试边界条件**
+6. **测试异常情况**
+7. **保持测试独立**
+8. **使用有意义的测试名称**
 
-#### 不要手动测试
+### 不应该做的
 
-自动化测试是系统化的。它们每次都以相同的方式运行。
+1. **不要跳过测试直接写代码**
+2. **不要写太大的测试**
+3. **不要让测试相互依赖**
+4. **不要忽略失败的测试**
+5. **不要过度测试私有方法**
+6. **不要在测试中使用随机数据（除非是专门测试随机性）**
+7. **不要让测试依赖外部资源（数据库、网络等）**
 
-#### 不要以为删除没有经过测试的代码是一种时间浪费
-
-没有真实测试的工作代码是技术债务，在将来可能会浪费更多的时间去解决。
-
-#### 不要以为TDD是教条主义
-
-TDD是务实的：
-- 在提交前发现bug（比提交后调试更快）
-- 防止回归（测试立即捕获破坏）
-- 记录行为（测试展示如何使用代码）
-- 支持重构（自由改变，测试捕获破坏）
-
-#### 不要让测试滞后，测试应该先于功能实现
-
-滞后的测试回答"这做了什么?"，前置的测试回答"这应该做什么?"
-
-滞后的测试被你的实现所偏向。你测试你构建的东西，而不是需要的东西。你验证记住的边缘情况，而不是发现的边缘情况。
-
-前置的测试在实现前强制发现边缘情况。
-
-## 常见的自我合理化
-
-| 借口 | 现实 |
-|------|------|
-| "太简单了不需要测试" | 简单的代码也会坏。测试只需30秒。 |
-| "我会事后测试" | 立即通过的测试什么都证明不了。 |
-| "测试事后能达到同样的目标" | 测试事后 = "这做了什么？"测试优先 = "这应该做什么？" |
-| "已经手动测试过了" | 临时 ≠ 系统化。没有记录，无法重新运行。 |
-| "删除X小时是浪费" | 沉没成本谬论。保留未验证的代码是技术债务。 |
-| "保留作为参考，先写测试" | 你会调整它。那就是测试事后。删除就是删除。 |
-| "需要先探索" | 可以。扔掉探索，用TDD开始。 |
-| "测试难 = 设计不清晰" | 听从测试。难以测试 = 难以使用。 |
-| "TDD会拖慢我" | TDD比调试快。务实 = 测试优先。 |
-| "手动测试更快" | 手动不能证明边缘情况。每次改变都要重新测试。 |
-| "现有代码没有测试" | 你在改进它。为现有代码添加测试。 |
-
-## 危险信号 - 停止并重新开始
-
-- 代码在测试之前
-- 实现后才测试
-- 测试立即通过
-- 无法解释为什么测试失败
-- 测试"稍后"添加
-- 自我合理化"就这一次"
-- "我已经手动测试过了"
-- "测试事后能达到同样的目的"
-- "这是关于精神而不是仪式"
-- "保留作为参考"或"调整现有代码"
-- "已经花了X小时，删除是浪费"
-- "TDD是教条主义，我在务实"
-- "这是不同的因为..."
-
-**所有这些都意味着：删除代码。用TDD重新开始。**
-
-## 示例：Bug修复
-
-**Bug：** 接受空邮箱
-
-**RED**
-```cpp
-// form_validation_test.cpp
-#include <gtest/gtest.h>
-#include "form_validation.h"
-
-TEST(FormValidationTest, RejectsEmptyEmail) {
-  FormData data;
-  data.email = "";
-
-  FormResult result = submitForm(data);
-
-  EXPECT_FALSE(result.success);
-  EXPECT_EQ(result.error, "Email required");
-}
-```
-
-**验证RED**
-
-```bash
-$ ./build/tests/form_validation_test
-[  FAILED  ] FormValidationTest.RejectsEmptyEmail
-Expected: "Email required"
-Actual: ""
-```
-
-**GREEN**
-
-```cpp
-// form_validation.cpp
-#include "form_validation.h"
-#include <algorithm>
-#include <cctype>
-
-// 辅助函数：去除字符串首尾空格
-std::string trim(const std::string& str) {
-  auto start = std::find_if_not(str.begin(), str.end(), ::isspace);
-  auto end = std::find_if_not(str.rbegin(), str.rend(), ::isspace).base();
-  return (start < end) ? std::string(start, end) : std::string();
-}
-
-FormResult submitForm(const FormData& data) {
-  std::string trimmedEmail = trim(data.email);
-  if (trimmedEmail.empty()) {
-    return FormResult{false, "Email required"};
-  }
-  // ...
-  return FormResult{true, ""};
-}
-```
-
-**验证GREEN**
-```bash
-$ ./build/tests/form_validation_test
-[  PASSED  ] FormValidationTest.RejectsEmptyEmail
-```
-
-**REFACTOR**
-如果需要，为多个字段提取验证。
-
-## 验证清单
+### 验证清单
 
 在标记工作完成之前：
 
@@ -616,3 +512,4 @@ $ ./build/tests/form_validation_test
 - 测试mock行为而不是真实行为
 - 在生产类中添加仅用于测试的方法
 - 在不理解依赖的情况下使用mock
+
