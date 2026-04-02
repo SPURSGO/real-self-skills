@@ -1,0 +1,58 @@
+# CMake 构建目录
+build/
+cmake-build-*/
+out/
+
+# Visual Studio
+.vs/
+CMakeSettings.json
+*.vcxproj.user
+*.suo
+*.sdf
+*.opensdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+x64/
+x86/
+Debug/
+Release/
+
+# CLion / JetBrains
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Claude Code
+
+# VS Code
+.vscode/
+
+# 编译产物
+*.obj
+*.o
+*.a
+*.lib
+# 但保留 lib/ 下的预编译第三方库
+!lib/*.lib
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.ilk
+*.exp
+
+# 预编译头
+*.gch
+*.pch
+
+# 日志和环境
+*.log
+.env*
+*.tmp
+
+# OS 生成文件
+Thumbs.db
+desktop.ini
+.DS_Store
