@@ -1,68 +1,39 @@
 {
-  "version": 3,
+  "version": 6,
   "configurePresets": [
     {
-      "name": "base",
-      "hidden": true,
+      "name": "ninja-debug",
+      "displayName": "Ninja Debug",
+      "description": "Ninja generator with Debug build type and compile_commands.json export",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "ENFORCE_V141_TOOLSET": "OFF"
+      }
+    },
+    {
+      "name": "vs-v141-configure",
+      "displayName": "VS Win32 v141",
+      "description": "Visual Studio 2022 with Win32 platform and v141 toolset",
       "generator": "Visual Studio 17 2022",
-      "architecture": "Win32",
-      "toolset": "v141"
-    },
-    {
-      "name": "config-with-test",
-      "inherits": "base",
-      "binaryDir": "${sourceDir}/build/with_test",
-      "cacheVariables": {
-        "BUILD_TESTS": "ON"
-      }
-    },
-    {
-      "name": "config-without-test",
-      "inherits": "base",
-      "binaryDir": "${sourceDir}/build/without_test",
-      "cacheVariables": {
-        "BUILD_TESTS": "OFF"
-      }
+      "architecture": {
+        "value": "Win32",
+        "strategy": "set"
+      },
+      "toolset": {
+        "value": "v141",
+        "strategy": "set"
+      },
+      "binaryDir": "${sourceDir}/build"
     }
   ],
   "buildPresets": [
     {
-      "name": "debug-with-test",
-      "configurePreset": "config-with-test",
+      "name": "vs-v141-build",
+      "configurePreset": "vs-v141-configure",
       "configuration": "Debug"
-    },
-    {
-      "name": "release-with-test",
-      "configurePreset": "config-with-test",
-      "configuration": "Release"
-    },
-    {
-      "name": "debug-without-test",
-      "configurePreset": "config-without-test",
-      "configuration": "Debug"
-    },
-    {
-      "name": "release-without-test",
-      "configurePreset": "config-without-test",
-      "configuration": "Release"
-    }
-  ],
-  "testPresets": [
-    {
-      "name": "test-debug",
-      "configurePreset": "config-with-test",
-      "configuration": "Debug",
-      "output": {
-        "outputOnFailure": true
-      }
-    },
-    {
-      "name": "test-release",
-      "configurePreset": "config-with-test",
-      "configuration": "Release",
-      "output": {
-        "outputOnFailure": true
-      }
     }
   ]
 }

@@ -1,2 +1,4 @@
 CompileFlags:
   Compiler: clang-cl
+  CompilationDatabase: build-ninja
+  
